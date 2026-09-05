@@ -1,0 +1,11 @@
+{
+  "name": "Mi Ganancia",
+  "short_name": "Mi Ganancia",
+  "description": "Calculá ventas, costos y ganancias de tu emprendimiento.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f6b55",
+  "lang": "es",
+  "icons": []
+}

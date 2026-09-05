@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f6b55">
+<title>Mi Ganancia</title>
+<style>
+:root{--green:#0f6b55;--light:#f4f8f6;--ink:#17352d;--muted:#71817c;--pink:#ffd8e8;--blue:#dcecff;--yellow:#fff0bd}
+*{box-sizing:border-box}body{margin:0;background:#eef3f1;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+.app{max-width:480px;margin:auto;min-height:100vh;background:white;box-shadow:0 0 30px #0001}.top{padding:22px 20px 10px;display:flex;justify-content:space-between;align-items:center}.brand{font-size:24px;font-weight:800}.leaf{color:var(--green)}.sub{font-size:12px;color:var(--muted)}
+main{padding:10px 18px 90px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{border-radius:16px;padding:15px}.card small{display:block;color:#52635e;margin-bottom:7px}.card b{font-size:22px}.green{background:#d9f3e9}.pink{background:var(--pink)}.blue{background:var(--blue)}.yellow{background:var(--yellow)}
+.section{margin-top:22px;font-size:18px;font-weight:800}.month{margin-top:10px;padding:16px;border-radius:18px;background:var(--light)}.row{display:flex;justify-content:space-between;margin:8px 0}.profit{color:var(--green);font-weight:800}.btn{border:0;border-radius:14px;padding:14px 18px;font-weight:800;font-size:16px;cursor:pointer}.primary{background:var(--green);color:white;width:100%;margin-top:14px}.secondary{background:#e9f0ed;color:var(--green)}input,select{width:100%;padding:13px;border:1px solid #d7e1dd;border-radius:11px;margin:6px 0 12px;font-size:16px}label{font-size:13px;font-weight:700}.screen{display:none}.screen.active{display:block}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);height:70px;background:#fff;border-top:1px solid #e5ebe8;display:grid;grid-template-columns:repeat(4,1fr);z-index:5}.nav button{border:0;background:none;color:#73817d;font-size:11px}.nav button.active{color:var(--green);font-weight:800}.nav span{display:block;font-size:21px;margin-bottom:3px}.product{padding:13px;border:1px solid #e2e9e6;border-radius:14px;margin:8px 0}.empty{text-align:center;color:var(--muted);padding:25px}.back{border:0;background:none;font-size:15px;color:var(--green);padding:4px 0 12px}.goal{background:#fff3f7;border-radius:18px;padding:18px;margin-top:12px}.big{font-size:28px;font-weight:900}.note{font-size:12px;color:var(--muted);line-height:1.4}
+</style>
+<link rel="manifest" href="manifest.json"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Mi Ganancia"></head>
+<body>
+<div class="app">
+<header class="top"><div><div class="brand"><span class="leaf">🍃</span> Mi Ganancia</div><div class="sub">Vendé. Controlá. Crecé.</div></div><div>⚙️</div></header>
+<main>
+<section id="home" class="screen active">
+<div class="cards">
+<div class="card green"><small>🛒 Ventas hoy</small><b id="todaySales">$0</b></div>
+<div class="card pink"><small>🧾 Costos hoy</small><b id="todayCosts">$0</b></div>
+<div class="card blue"><small>📊 Ganancia hoy</small><b id="todayProfit">$0</b></div>
+<div class="card yellow"><small>％ Margen</small><b id="todayMargin">0%</b></div>
+</div>
+<div class="section">Este mes</div>
+<div class="month"><div class="row"><span>Ventas</span><b id="monthSales">$0</b></div><div class="row"><span>Costos</span><b id="monthCosts">$0</b></div><div class="row"><span>Ganancia</span><b class="profit" id="monthProfit">$0</b></div></div>
+<button class="btn primary" onclick="show('sale')">＋ Nueva venta</button>
+<div class="section">🎯 Mi objetivo</div>
+<div class="goal"><div class="note">Objetivo mensual</div><div class="big" id="goalDisplay">$1.000.000</div><div class="note" id="goalText">Configurá tu objetivo desde Objetivo.</div></div>
+</section>
+
+<section id="sale" class="screen">
+<button class="back" onclick="show('home')">← Volver</button><h2>Nueva venta</h2>
+<label>Producto o servicio</label><input id="saleName" placeholder="Ej.: Vela aromática">
+<label>Cantidad</label><input id="saleQty" type="number" min="1" value="1">
+<label>Precio de venta por unidad</label><input id="salePrice" type="number" min="0" placeholder="8000">
+<label>Costo por unidad</label><input id="saleCost" type="number" min="0" placeholder="3000">
+<label>Comisión / otros costos de la venta</label><input id="saleExtra" type="number" min="0" value="0">
+<label>Forma de pago</label><select id="salePay"><option>Transferencia</option><option>Efectivo</option><option>Mercado Pago</option><option>Tarjeta</option><option>Otro</option></select>
+<button class="btn primary" onclick="saveSale()">Guardar venta</button>
+</section>
+
+<section id="products" class="screen">
+<h2>Mis productos</h2>
+<button class="btn secondary" onclick="addProduct()">＋ Agregar producto</button>
+<div id="productList"></div>
+</section>
+
+<section id="stats" class="screen">
+<h2>Estadísticas</h2>
+<div class="cards"><div class="card green"><small>Ventas</small><b id="stSales">$0</b></div><div class="card blue"><small>Ganancia</small><b id="stProfit">$0</b></div></div>
+<div class="section">Últimas ventas</div><div id="salesList"></div>
+<div class="section">🎯 Objetivo mensual</div>
+<label>¿Cuánto querés ganar?</label><input id="goalInput" type="number" value="1000000">
+<button class="btn primary" onclick="saveGoal()">Guardar objetivo</button>
+</section>
+</main>
+<nav class="nav">
+<button onclick="show('home')" id="navhome" class="active"><span>⌂</span>Inicio</button>
+<button onclick="show('products')" id="navproducts"><span>♡</span>Productos</button>
+<button onclick="show('sale')" id="navsale"><span>🛒</span>Ventas</button>
+<button onclick="show('stats')" id="navstats"><span>▥</span>Más</button>
+</nav>
+</div>
+<script>
+const key='miGananciaData';
+let data=JSON.parse(localStorage.getItem(key)||'{"sales":[],"products":[],"goal":1000000}');
+const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n||0);
+const today=()=>new Date().toISOString().slice(0,10);
+function persist(){localStorage.setItem(key,JSON.stringify(data));render()}
+function show(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+ let n=document.getElementById('nav'+id); if(n)n.classList.add('active');
+ render();
+}
+function totals(filter){
+ return data.sales.filter(filter).reduce((a,s)=>{a.sales+=s.total;a.costs+=s.cost;a.profit+=s.profit;return a},{sales:0,costs:0,profit:0});
+}
+function render(){
+ const t=totals(s=>s.date===today()), m=totals(s=>s.date.slice(0,7)===today().slice(0,7));
+ todaySales.textContent=money(t.sales);todayCosts.textContent=money(t.costs);todayProfit.textContent=money(t.profit);
+ todayMargin.textContent=(t.sales?Math.round(t.profit/t.sales*100):0)+'%';
+ monthSales.textContent=money(m.sales);monthCosts.textContent=money(m.costs);monthProfit.textContent=money(m.profit);
+ goalDisplay.textContent=money(data.goal);
+ const remain=Math.max(0,data.goal-m.profit), days=Math.max(1, new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate()-new Date().getDate()+1);
+ goalText.textContent=remain?`Te faltan ${money(remain)}. Aproximadamente ${money(remain/days)} de ganancia por día.`:'¡Objetivo alcanzado! 🎉';
+ stSales.textContent=money(m.sales);stProfit.textContent=money(m.profit);goalInput.value=data.goal;
+ productList.innerHTML=data.products.length?data.products.map((p,i)=>`<div class="product"><b>${esc(p.name)}</b><div class="note">Venta: ${money(p.price)} · Costo: ${money(p.cost)} · Ganancia: ${money(p.price-p.cost)}</div></div>`).join(''):'<div class="empty">Todavía no agregaste productos.</div>';
+ salesList.innerHTML=data.sales.slice().reverse().slice(0,10).map(s=>`<div class="product"><b>${esc(s.name)}</b><div>${s.qty} × ${money(s.price)} = ${money(s.total)}</div><div class="note">Costo ${money(s.cost)} · Ganancia <span class="profit">${money(s.profit)}</span> · ${s.pay}</div></div>`).join('')||'<div class="empty">Todavía no hay ventas.</div>';
+}
+function saveSale(){
+ const name=saleName.value.trim();const qty=+saleQty.value||0,price=+salePrice.value||0,costUnit=+saleCost.value||0,extra=+saleExtra.value||0;
+ if(!name||qty<1||price<=0){alert('Completá producto, cantidad y precio.');return}
+ const total=qty*price,cost=qty*costUnit+extra;
+ data.sales.push({name,qty,price,total,cost,profit:total-cost,pay:salePay.value,date:today()});
+ saleName.value='';saleQty.value=1;salePrice.value='';saleCost.value='';saleExtra.value=0;show('home');persist();
+}
+function addProduct(){
+ const name=prompt('Nombre del producto o servicio:');if(!name)return;
+ const price=+prompt('Precio de venta:')||0,cost=+prompt('Costo:')||0;
+ data.products.push({name,price,cost});persist();
+}
+function saveGoal(){data.goal=Math.max(0,+goalInput.value||0);persist();alert('Objetivo guardado.')}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+render();
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js").catch(()=>{});}</script></body>
+</html>
