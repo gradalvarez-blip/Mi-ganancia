@@ -99,11 +99,47 @@ function saveSale(){
  data.sales.push({name,qty,price,total,cost,profit:total-cost,pay:salePay.value,date:today()});
  saleName.value='';saleQty.value=1;salePrice.value='';saleCost.value='';saleExtra.value=0;show('home');persist();
 }
+
 function addProduct(){
- const name=prompt('Nombre del producto o servicio:');if(!name)return;
- const price=+prompt('Precio de venta:')||0,cost=+prompt('Costo:')||0;
- data.products.push({name,price,cost});persist();
+ const name=prompt('Nombre del producto o servicio:');
+ if(!name || !name.trim()) return;
+
+ const type=prompt('Escribí producto o servicio:','producto');
+ if(!type || !['producto','servicio'].includes(type.trim().toLowerCase())){
+  alert('Escribí producto o servicio.');
+  return;
+ }
+
+ const price=Number(prompt('Precio de venta por unidad:'))||0;
+ const cost=Number(prompt('Costo por unidad:'))||0;
+
+ if(price<=0 || cost<0){
+  alert('Ingresá un precio mayor que cero y un costo válido.');
+  return;
+ }
+
+ let stock=null;
+ if(type.trim().toLowerCase()==='producto'){
+  const stockText=prompt('Stock disponible (opcional). Dejá vacío si no querés indicarlo:');
+  if(stockText!==null && stockText.trim()!==''){
+   stock=Number(stockText);
+   if(!Number.isFinite(stock)||stock<0){
+    alert('El stock debe ser cero o un número positivo.');
+    return;
+   }
+  }
+ }
+
+ data.products.push({
+  name:name.trim(),
+  type:type.trim().toLowerCase(),
+  price,
+  cost,
+  stock
+ });
+ persist();
 }
+
 function saveGoal(){data.goal=Math.max(0,+goalInput.value||0);persist();alert('Objetivo guardado.')}
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 render();
