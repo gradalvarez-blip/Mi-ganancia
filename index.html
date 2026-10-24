@@ -100,15 +100,57 @@ function saveSale(){
  saleName.value='';saleQty.value=1;salePrice.value='';saleCost.value='';saleExtra.value=0;show('home');persist();
 }
 
+
 function addProduct(){
  const name=prompt('Nombre del producto o servicio:');
- if(!name || !name.trim()) return;
+ if(name===null || !name.trim()) return;
 
- const type=prompt('Escribí producto o servicio:','producto');
- if(!type || !['producto','servicio'].includes(type.trim().toLowerCase())){
+ const type=prompt('Tipo: escribí producto o servicio','producto');
+ if(type===null) return;
+
+ const normalizedType=type.trim().toLowerCase();
+ if(!['producto','servicio'].includes(normalizedType)){
   alert('Escribí producto o servicio.');
   return;
  }
+
+ const priceText=prompt('Precio de venta por unidad:');
+ if(priceText===null) return;
+ const price=Number(priceText);
+
+ const costText=prompt('Costo por unidad:');
+ if(costText===null) return;
+ const cost=Number(costText);
+
+ if(price<=0 || !Number.isFinite(price) ||
+    cost<0 || !Number.isFinite(cost)){
+  alert('Ingresá un precio mayor que cero y un costo válido.');
+  return;
+ }
+
+ let stock=null;
+ if(normalizedType==='producto'){
+  const stockText=prompt('Stock disponible (opcional):');
+  if(stockText!==null && stockText.trim()!==''){
+   stock=Number(stockText);
+   if(!Number.isFinite(stock)||stock<0){
+    alert('El stock debe ser cero o un número positivo.');
+    return;
+   }
+  }
+ }
+
+ data.products.push({
+  name:name.trim(),
+  type:normalizedType,
+  price:price,
+  cost:cost,
+  stock:stock
+ });
+
+ persist();
+}
+
 
  const price=Number(prompt('Precio de venta por unidad:'))||0;
  const cost=Number(prompt('Costo por unidad:'))||0;
